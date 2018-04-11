@@ -7,7 +7,7 @@ if [[ $UID != 0 ]]; then
 fi
 
 echo "Setting up udev rule for garmin..."
-sudo cp garmin-udev.sh /usr/local/bin/
-sudo echo "ACTION==\"add\", SUBSYSTEM==\"usb\", ATTR{idVendor}==\"091e\", ATTR{idProduct}==\"2a2c\", RUN+=\"/usr/local/bin/garmin-udev.sh\"" > "/etc/udev/rules.d/85-garmin.rules"
+sudo cp garmin-backup.py /usr/local/bin/
+sudo echo "ACTION==\"add\", SUBSYSTEM==\"usb\", ATTR{idVendor}==\"091e\", ATTR{idProduct}==\"2a2c\", RUN+=\"/usr/local/bin/garmin-backup.py\"" > "/etc/udev/rules.d/85-garmin.rules"
 sudo udevadm control -R
 echo "If garmin doesn't sync the vendor and product id might need to be changed. They can be found using lsusb"
