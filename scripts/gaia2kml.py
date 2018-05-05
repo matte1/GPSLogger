@@ -17,6 +17,9 @@ from PIL import Image
 from src.GeoImage import GeoImage
 
 
+def fucking_apple(images):
+    pass
+
 def parse_geojson(file):
     coordinates = []
     with open(file) as infile:
@@ -67,7 +70,7 @@ def sort_geotagged_images(geotagged_imgs):
     for idx, img in enumerate(imgs):
         img[1].idx = idx
 
-
+# TODO: HANDLE HEIC TIMESTAMPING ISSUE
 if __name__ == '__main__':
     aparser = argparse.ArgumentParser()
     aparser.add_argument('--dir', help='directory with KML information',
@@ -75,18 +78,19 @@ if __name__ == '__main__':
     args = aparser.parse_args()
 
     # Read coordinates from geojason files
-    coords = [[]]
-    kml_dir = os.path.join(args.dir, 'gaia')
-    for file in os.listdir(kml_dir):
-        coords.append(parse_geojson(os.path.join(kml_dir, file)))
+    coords = [parse_geojson(os.path.join(args.dir, file))
+              for file in os.listdir(args.dir) if '.geojson' in file]
+
 
     # Read exif data from images
     geotagged_imgs = []
-    imgs = [file for file in os.listdir(args.dir) if '.jpg' in file]
+    img_dir = os.path.join(args.dir, 'images')
+    imgs = [file for file in os.listdir(img_dir) if '.jpg' in file]
+
     for img in imgs:
-        with open(os.path.join(args.dir, img), 'rb') as infile:
+        with open(os.path.join(img_dir, img), 'rb') as infile:
             tags = exifread.process_file(infile)
-            geotagged_imgs.append(GeoImage(tags, os.path.join(args.dir, img), sum(coords, [])))
+            geotagged_imgs.append(GeoImage(tags, os.path.join(img_dir, img), sum(coords, [])))
 
     # Create KML and add tracks to it from geojson
     kml = simplekml.Kml()

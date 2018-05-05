@@ -4,6 +4,7 @@ import re
 import datetime
 import math
 from PIL import Image
+from pathlib import Path
 
 def dms2dec(dms_str):
     """Return decimal representation of DMS """
@@ -64,6 +65,14 @@ class GeoImage(object):
             tokens = [int(t) for t in self.date_time.replace(' ', ':').split(':')]
             self.epoch = datetime.datetime(tokens[0], tokens[1], tokens[2],
                                            tokens[3], tokens[4]).timestamp()
+        # HACK: THIS IS SHITTY FUCKING LOGIC - SCREW YOU APPLE FOR MAKING ME
+        # DO THIS!!!
+        elif Path(self.path).with_suffix('.heic').exists():
+            print('FUK U APPLE')
+            info = os.stat(str(Path(self.path).with_suffix('.heic')))
+            self.epoch = info.st_mtime
+            self.date_time = time.strftime('%Y:%m:%d %H:%M:%S',
+                                           time.localtime(info.st_mtime))
         else:
             info = os.stat(self.path)
             self.epoch = info.st_mtime
