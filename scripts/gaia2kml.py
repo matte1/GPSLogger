@@ -15,6 +15,7 @@ from pprint import pprint
 import re
 from PIL import Image
 from src.GeoImage import GeoImage
+from pathlib import Path
 
 
 def fucking_apple(images):
@@ -22,7 +23,7 @@ def fucking_apple(images):
 
 def parse_geojson(file):
     coordinates = []
-    with open(file) as infile:
+    with file.open() as infile:
         data = json.load(infile)
         for d in data['features'][0]['geometry']['coordinates']:
             coordinates.extend(d)
@@ -73,29 +74,27 @@ def sort_geotagged_images(geotagged_imgs):
 # TODO: HANDLE HEIC TIMESTAMPING ISSUE
 if __name__ == '__main__':
     aparser = argparse.ArgumentParser()
-    aparser.add_argument('--dir', help='directory with KML information',
+    aparser.add_argument('--folder', help='directory with KML information',
                          type=str, required=True)
     args = aparser.parse_args()
 
-    # Read coordinates from geojason files
-    coords = [parse_geojson(os.path.join(args.dir, file))
-              for file in os.listdir(args.dir) if '.geojson' in file]
-
+    folder = Path(args.folder)
+    coords = [parse_geojson(fi) for fi in folder.iterdir()
+              if fi.suffix == '.geojson']
 
     # Read exif data from images
     geotagged_imgs = []
-    img_dir = os.path.join(args.dir, 'images')
-    imgs = [file for file in os.listdir(img_dir) if '.jpg' in file]
+    imgs = [fi for fi in folder.iterdir() if fi.suffix == '.jpg']
 
     for img in imgs:
-        with open(os.path.join(img_dir, img), 'rb') as infile:
+        with img.open('rb') as infile:
             tags = exifread.process_file(infile)
-            geotagged_imgs.append(GeoImage(tags, os.path.join(img_dir, img), sum(coords, [])))
+            geotagged_imgs.append(GeoImage(tags, str(img), sum(coords, [])))
 
     # Create KML and add tracks to it from geojson
     kml = simplekml.Kml()
     create_tracks(kml, coords)
-    correct_image_rotations(args.dir, geotagged_imgs)
+    correct_image_rotations(args.folder, geotagged_imgs)
     sort_geotagged_images(geotagged_imgs)
 
     # Add images to KMZ and save it
@@ -109,4 +108,5 @@ if __name__ == '__main__':
         else:
             print('Unknown Lat/long for {:s}'.format(geotagged.path))
 
-    kml.savekmz(os.path.join(args.dir, args.dir.split('/')[-1] + ".kmz"), format=False)  # Saving as KMZ
+    # kml.savekmz(os.path.join(args.dir, args.dir.split('/')[-1] + ".kmz"), format=False)  # Saving as KMZ
+    kml.savekmz(str(folder / (folder.name + ".kmz")), format=False)  # Saving as KMZ
