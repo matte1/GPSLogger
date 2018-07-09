@@ -1,5 +1,18 @@
 # Introduction
 
+### Design Notes
+
+#### Plotting
+
+ 1. Write a basic html plotting tool that displays time in HeartRate Zones per week, per month, per year
+
+#### Running
+
+ 1. Write a tool that attempts to calculate AeT from seen runs.
+ 2. Write a tool that attempts to calculate how Heart Rate scales with speed.
+ 3. Generate training plans algoithmically based on where I'm at and a mix of hill/interval work.
+
+
 ### gaia2kml
 
 gaia2kml creates a simple correspondence between a set of images and geojson tracks from gaia by matching looking at image EXIF data when available and timestamps when not present. Its saved as a kmz which can be loaded easily into google earth. Expects a directory setup like the following.
