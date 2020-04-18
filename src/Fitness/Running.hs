@@ -2,13 +2,13 @@
 {-# LANGUAGE QuasiQuotes #-}
 
 -- | Algorithms for measuring running performance.
-module Running
+module Fitness.Running
     ( exportRunningStats
     , printNominalDiffTimeAsHours
     ) where
 
-import Fit
-import HeartRate
+import Fitness.Garmin
+import Fitness.HeartRate
 
 import Data.Time.Clock ( NominalDiffTime(..) )
 import qualified Data.Text as T

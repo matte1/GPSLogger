@@ -26,10 +26,10 @@ source-repository head
 
 library
   exposed-modules:
-      Fit
-      Running
-      HeartRate
-      Utils
+      Fitness.Fit
+      Fitness.Running
+      Fitness.HeartRate
+      Fitness.Utils
   other-modules:
       Paths_LifeOfMatt
   hs-source-dirs:

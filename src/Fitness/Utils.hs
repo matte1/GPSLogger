@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module Utils
+module Fitness.Utils
     ( pairs
     , appendItemToListInMap
     ) where

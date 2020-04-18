@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 -- | Module for working with jsons derived from fit file.
-module Fit
+module Fitness.Garmin
     ( Activity(..)
     , Record(..)
     , Sport(..)
@@ -12,7 +12,7 @@ module Fit
     , fitFileDir
     ) where
 
-import Utils (appendItemToListInMap, pairs)
+import Fitness.Utils (appendItemToListInMap, pairs)
 
 import Data.Aeson hiding (pairs)
 import Data.Time.Calendar.WeekDate

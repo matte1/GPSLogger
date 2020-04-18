@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Running
+import Fitness.Running
 
 main :: IO ()
 main = do

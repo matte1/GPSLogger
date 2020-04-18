@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module HeartRate
+module Fitness.HeartRate
     ( HeartRateZones(..)
     , getTimeInHrZonesPerWeek
     ) where
 
-import Fit
-import Utils
+import Fitness.Garmin
+import Fitness.Utils
 
 import Data.Aeson hiding (pairs)
 import Data.Time.Calendar.WeekDate
