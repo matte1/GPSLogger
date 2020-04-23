@@ -49,7 +49,7 @@ writeWeeklyRunningsToCsv =
           hrz = (pure printNominalDiffTimeAsHours) <*> (heartRateZones wr)
           totalTime = sum hrz
       in [fmt|\
-{year},\
+{date},\
 {week},\
 {miles wr},\
 {elevation wr},\
