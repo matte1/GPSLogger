@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="usb", ENV{PRODUCT}=="91e/2a2c/509", RUN+="/usr/bin/python3 /usr/local/bin/backup.py"

@@ -2,16 +2,22 @@
 
 ### Design Notes
 
-#### Plotting
+#### Website
 
- 1. Write a basic html plotting tool that displays time in HeartRate Zones per week, per month, per year
+ 1. Sweet website with all the derived plots from Running / Financials
+ 2. Link to google photo albums
 
 #### Running
 
  1. Write a tool that attempts to calculate AeT from seen runs.
  2. Write a tool that attempts to calculate how Heart Rate scales with speed.
  3. Generate training plans algoithmically based on where I'm at and a mix of hill/interval work.
+ 4. Write a basic html plotting tool that displays time in HeartRate Zones per week, per month, per year
 
+
+#### Financials
+
+ 1.
 
 ### gaia2kml
 
@@ -35,33 +41,3 @@ gaia2kml creates a simple correspondence between a set of images and geojson tra
 ```
 python3 gaia2kml --dir log/gaia/folder
 ```
-
-### TODO
-
-1. Running Stats
-  - GPS History (Colorize mile by pace)
-  - Races
-  - Fastest times
-2. Garmin Daily Stats FitFile
-  - sleep schedule
-  - steps
-3. Surfing Stats
-  - GPS History
-  - Favorite Spots
-  - Time in Water
-4. Adventure Stats
-  - GPS History + Pictures
-  - Faster times, most elevation, longest hike, etc...
-5. Expense Stats
-  - Breakdown by category per week/month/year (pull from Mint)
-6. Investment Stats
-  - Only percentage / diversity
-7. Driving Stats
-  - GPS History
-  - ML Dataset?
-8. Google Maps Timeline data
-9. GeoViz - Google earth, open street view, etc...
-
-### NOTES
-
-1. Fit lap message contains calories expended during that lap
