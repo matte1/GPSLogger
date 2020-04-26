@@ -40,12 +40,10 @@ data Record =
   { altitude           :: Double
   , cadence            :: Double
   , distance           :: Double
-  , enhancedAltitude   :: Double
-  , enhancedSpeed      :: Double
   , fractionalCadence  :: Double
   , heartRate          :: Double
-  , positionLat        :: Double
-  , positionLong       :: Double
+  , lat                :: Double
+  , long               :: Double
   , speed              :: Double
   , temperature        :: Double
   , timestamp          :: UTCTime
