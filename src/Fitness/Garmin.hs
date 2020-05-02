@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 -- | Module for working with jsons derived from fit file.
 module Fitness.Garmin
@@ -23,8 +24,22 @@ import System.Directory (listDirectory)
 import qualified Data.Text as T
 import Data.Maybe (catMaybes)
 import qualified Data.ByteString.Lazy as B
+import PyF ( fmt )
 
-data Sport = Run | TrailRun | SUP | Climb
+data Sport
+  = Run
+  | TrailRun
+  | SUP
+  | Climb
+  | BikeIndoor
+  | MTB
+  | Hike
+  | Abs
+  | Bike
+  | Climbing
+  | Stopwatch
+  | Yoga
+  | Navigate
   deriving (Eq, Generic, Show)
 instance FromJSON Sport
 
@@ -37,15 +52,15 @@ instance FromJSON Activity
 
 data Record =
   Record
-  { altitude           :: Double
-  , cadence            :: Double
-  , distance           :: Double
-  , fractionalCadence  :: Double
-  , heartRate          :: Double
-  , lat                :: Double
-  , long               :: Double
-  , speed              :: Double
-  , temperature        :: Double
+  { altitude           :: Maybe Double
+  , cadence            :: Maybe Double
+  , distance           :: Maybe Double
+  , fractionalCadence  :: Maybe Double
+  , heartRate          :: Maybe Double
+  , lat                :: Maybe Double
+  , long               :: Maybe Double
+  , speed              :: Maybe Double
+  , temperature        :: Maybe Double
   , timestamp          :: UTCTime
   } deriving (Show, Read, Generic)
 instance FromJSON Record
@@ -58,7 +73,9 @@ extractActivityIfJson file =
   if T.isSuffixOf ".json" $ T.pack file
     then do
       bytes <- B.readFile file
-      pure (decode bytes)
+      case eitherDecode bytes of
+        Left err -> error [fmt|\nFailed to parse {file}\n{err}\n|]
+        Right json -> pure (Just json)
     else
       pure Nothing
 

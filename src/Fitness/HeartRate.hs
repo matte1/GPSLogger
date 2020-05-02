@@ -4,6 +4,7 @@
 module Fitness.HeartRate
     ( HeartRateZones(..)
     , getTimeInHrZonesPerWeek
+    , getTimeInHrZones
     ) where
 
 import Fitness.Garmin
@@ -90,7 +91,13 @@ getTimeInHrZones = foldl accumTimeInHrZone (pure 0) . pairs . records
       HeartRateZones NominalDiffTime
     accumTimeInHrZone timeInZones (r1, r2) = accumByHeartRateZone meanHr timeDiff timeInZones
       where
-        meanHr :: Double
-        meanHr = (heartRate r1 + heartRate r2) / 2
+        meanHr = calcMeanHr (heartRate r1) (heartRate r2)
+
+        calcMeanHr :: Maybe Double -> Maybe Double -> Double
+        calcMeanHr (Just hr1) (Just hr2) = (hr1 + hr2) / 2
+        calcMeanHr (Just hr1) Nothing = hr1
+        calcMeanHr Nothing (Just hr2) = hr2
+        calcMeanHr Nothing Nothing = 0
+
         timeDiff :: NominalDiffTime
         timeDiff = diffUTCTime (timestamp r2) (timestamp r1)

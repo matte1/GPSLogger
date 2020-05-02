@@ -16,29 +16,28 @@ def convert_to_timestamp(ts):
   assert len(ts) == 2, f"Unknown timestamp format! {ts}"
   return ts[0] + 'T' + ts[1] + 'Z'
 
-def maybe(d, k):
-  if k in d:
-    return f'Just {d[k]}'
-  return 'Nothing'
+def maybe(d1, k1, d2, k2):
+  if k2 in d2:
+    d1[k1] = d2[k2]
+  return d1
 
 def format_messages(messages):
   '''Formats a fit 'record' into a something digestable by haskell.'''
   formatted_messages = []
   for msg in messages:
     msg = msg.get_values()
-    formatted_messages.append(
-      { 'cadence': maybe(msg, 'cadence'),
-        'distance': maybe(msg, 'distance'),
-        'altitude': maybe(msg, 'enhanced_altitude'),
-        'speed': maybe(msg, 'enhanced_speed'),
-        'fractionalCadence': maybe(msg, 'fractional_cadence'),
-        'heartRate': maybe(msg, 'heart_rate'),
-        'lat': maybe(msg, 'position_lat'),
-        'lon': maybe(msg, 'position_long'),
-        'temperature': maybe(msg, 'temperature'),
-        'timestamp': convert_to_timestamp(msg['timestamp']),
-      }
-    )
+    formatted_msg = {}
+    maybe(formatted_msg, 'cadence', msg, 'cadence')
+    maybe(formatted_msg, 'distance', msg, 'distance')
+    maybe(formatted_msg, 'altitude', msg, 'enhanced_altitude')
+    maybe(formatted_msg, 'speed', msg, 'enhanced_speed')
+    maybe(formatted_msg, 'fractionalCadence', msg, 'fractional_cadence')
+    maybe(formatted_msg, 'heartRate', msg, 'heart_rate')
+    maybe(formatted_msg, 'lat', msg, 'position_lat')
+    maybe(formatted_msg, 'lon', msg, 'position_long')
+    maybe(formatted_msg, 'temperature', msg, 'temperature')
+    formatted_msg['timestamp'] = convert_to_timestamp(msg['timestamp'])
+    formatted_messages.append(formatted_msg)
 
   return formatted_messages
 
