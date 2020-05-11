@@ -2,4 +2,4 @@
 data/gaia/**
 data/garmin/jsons/**
 scripts/garmin/__pycache__/**
-elm/elm-stuff/**
+src/Elm/elm-stuff/**
