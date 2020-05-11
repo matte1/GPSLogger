@@ -10,6 +10,7 @@
 
 module Fitness.Running
     ( mkRunningMetrics
+    , getRunningMetrics
     ) where
 
 import Fitness.Garmin
@@ -32,18 +33,26 @@ data RunningMetrics
     , elevationLoss :: Double
     , totalHeartBeats :: Double
     , totalTime :: Double
-    -- , year :: Int
-    -- , month :: Int
-    -- , day :: Int
     }
 instance Show RunningMetrics where
   show rm = [fmt|\
 miles: {(meters rm / 1600):.2}
 metersPerHeartBeat: {(metersPerHeartBeat rm * 100):.2}
-timeInHrZones: {show $ timeInHrZones rm}
+timeInHrZones: {show $ toHoursMins <$> timeInHrZones rm}
 elevationGain: {(elevationGain rm):.2}
-totalTime: {(totalTime rm):.2}
+totalTime: toHoursMins (totalTime rm)
 |]
+instance Semigroup RunningMetrics where
+  (<>) rm1 rm2 =
+    RunningMetrics
+    { meters = meters rm1 + meters rm2
+    , metersPerHeartBeat = (meters rm1 + meters rm2) / (totalHeartBeats rm1 + totalHeartBeats rm2)
+    , timeInHrZones = (+) <$> timeInHrZones rm1 <*> timeInHrZones rm2
+    , elevationGain = elevationGain rm1 + elevationGain rm2
+    , elevationLoss = elevationLoss rm1 + elevationLoss rm2
+    , totalHeartBeats = totalHeartBeats rm1 + totalHeartBeats rm2
+    , totalTime = totalTime rm1 + totalTime rm2
+    }
 
 mkRunningMetrics :: Activity -> RunningMetrics
 mkRunningMetrics activity = running
@@ -60,6 +69,15 @@ mkRunningMetrics activity = running
       }
     elevationChanges = changes rs altitudeOrZero
     rs = records activity
+
+getRunningMetrics :: IO (M.Map (Year, Week) [RunningMetrics])
+getRunningMetrics = do
+  activities <- getActivitiesFromDir fitFileDir
+  let runningMetrics =
+        M.map (fmap mkRunningMetrics) $
+        groupActivitesByYearWeek $ filterBySport [Run, TrailRun] activities
+  pure runningMetrics
+
 
 -- getHeartBeatsOfActivites :: [Activity] -> Double
 -- getHeartBeatsOfActivites = sum . fmap (flip integrateRecords getHeartRateOrZero) . fmap records
@@ -87,12 +105,12 @@ mkRunningMetrics activity = running
 --       , heartRateZones = foldl1 (\hz1 hz2 -> (+) <$> hz1 <*> hz2) $ fmap getTimeInHrZones activities
 --       , averageHrPower = getDistanceOfActivities activities / getHeartBeatsOfActivites activities
 --       }
-
+--
 ----------------------------------------------------------------------------------------------------
 -- Rendering
 -- TODO: Make a separate file for this
 ----------------------------------------------------------------------------------------------------
-
+--
 -- csvWriter :: (Int, Int) -> WeeklyRunning -> T.Text
 -- csvWriter (year, week) wr =
 --   let hrz = (pure (\x -> getDoubleFromNominalDiffTime x / 3600)) <*> (heartRateZones wr)
@@ -117,16 +135,7 @@ mkRunningMetrics activity = running
 --   T.intercalate "\n" .
 --   map snd . M.toList $
 --   M.mapWithKey writer weeks
-
-getRunningMetrics :: IO (M.Map (Year, Week) [RunningMetrics])
-getRunningMetrics = do
-  activities <- getActivitiesFromDir fitFileDir
-  let runningMetrics =
-        M.map (fmap mkRunningMetrics) $
-        groupActivitesByYearWeek $ filterBySport [Run, TrailRun] activities
-      flatRunningMetrics = M.map (filter (\rm ->  elevationGain rm < 250)) runningMetrics
-  pure flatRunningMetrics
-
+--
 -- exportRunningStats :: FilePath -> IO ()
 -- exportRunningStats output = do
 --   activities <- getActivitiesFromDir fitFileDir

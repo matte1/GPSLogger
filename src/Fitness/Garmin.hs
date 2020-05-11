@@ -8,8 +8,8 @@ module Fitness.Garmin
     ( Activity(..)
     , Record(..)
     , Sport(..)
-    , Week
-    , Year
+    , Week(..)
+    , Year(..)
 
      -- * Data Extraction
     , unsafeTotalDistance
@@ -55,6 +55,8 @@ data Sport
   | Stopwatch
   | Yoga
   | Navigate
+  | Bouldering
+  | Strength
   deriving (Eq, Generic, Show)
 instance FromJSON Sport
 

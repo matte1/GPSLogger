@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Fitness.Running
+import Fitness.Garmin
 
 main :: IO ()
 main = do
-  -- exportRunningStats "/home/matt/projects/LifeOfMatt/data/garmin/running_stats.csv"
+  rms <- getRunningMetrics
   pure ()

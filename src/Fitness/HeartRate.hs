@@ -59,7 +59,7 @@ heartRateZones =
   , zone2 = 133
   , zone3 = 152
   , zone4 = 171
-  , zone5 = 190
+  , zone5 = 184
   }
 
 -- | Accumulate a value by the heart rate zone at which it was done in.
