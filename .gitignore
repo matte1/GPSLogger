@@ -1,3 +1,5 @@
 .stack-work
 data/gaia/**
 data/garmin/jsons/**
+scripts/garmin/__pycache__/**
+elm/elm-stuff/**

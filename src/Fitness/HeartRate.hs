@@ -77,19 +77,19 @@ accumByHeartRateZone hr value zones = (+) <$> valueInZone <*> zones
 -- | Accumulate the amount of time in seconds spent in each hear rate zone per week.
 getTimeInHrZonesPerWeek ::
   M.Map (Int, Int) [Activity] ->
-  M.Map (Int, Int) (HeartRateZones NominalDiffTime)
+  M.Map (Int, Int) (HeartRateZones Double)
 getTimeInHrZonesPerWeek activitiesByWeek =
   M.map (foldl1 (\hz1 hz2 -> (+) <$> hz1 <*> hz2) . fmap getTimeInHrZones) activitiesByWeek
 
 -- | Get the time spent in a heart rate zone per Activity.
-getTimeInHrZones :: Activity -> HeartRateZones NominalDiffTime
+getTimeInHrZones :: Activity -> HeartRateZones Double
 getTimeInHrZones = foldl accumTimeInHrZone (pure 0) . pairs . records
   where
     accumTimeInHrZone ::
-      HeartRateZones NominalDiffTime ->
+      HeartRateZones Double ->
       (Record, Record) ->
-      HeartRateZones NominalDiffTime
-    accumTimeInHrZone timeInZones (r1, r2) = accumByHeartRateZone meanHr timeDiff timeInZones
+      HeartRateZones Double
+    accumTimeInHrZone timeInZones (r1, r2) = accumByHeartRateZone meanHr dt timeInZones
       where
         meanHr = calcMeanHr (heartRate r1) (heartRate r2)
 
@@ -99,5 +99,5 @@ getTimeInHrZones = foldl accumTimeInHrZone (pure 0) . pairs . records
         calcMeanHr Nothing (Just hr2) = hr2
         calcMeanHr Nothing Nothing = 0
 
-        timeDiff :: NominalDiffTime
-        timeDiff = diffUTCTime (timestamp r2) (timestamp r1)
+        dt :: Double
+        dt = doubleFromNominalDiffTime $ diffUTCTime (timestamp r2) (timestamp r1)

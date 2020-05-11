@@ -41,12 +41,23 @@ def format_messages(messages):
 
   return formatted_messages
 
-# TODO(matte): Wrap this an emailer context.
+def get_workout(fitfile):
+  workout = list(fitfile.get_messages(name='workout'))
+  assert len(workout) == 1, f'The length of workout should always be 1!\n'
+  for field in workout[0].fields:
+    if field.name == 'wkt_name':
+      return field.raw_value
+  assert True, f'We never found "wkt_name" in the workout fields!\n'
+
 def get_sport(fitfile):
   '''We should only ever have one sport. If we have zero than throw an error!'''
   sports = list(fitfile.get_messages(name='sport'))
   assert len(sports) == 1, f'The length of sports should always be 1!\n'
-  return sports[0].fields[0].raw_value.replace(' ', '')
+  sport = sports[0].fields[0].raw_value
+  # NOTE: Abs is included here because that was the original name of Workouts...
+  if sport == 'Workouts':
+    sport = get_workout(fitfile)
+  return sport.replace(' ', '')
 
 def get_records(fitfile):
   records = fitfile.get_messages(name=['record'])
@@ -59,20 +70,20 @@ def fit2json(filename):
   '''Convert a fit file into a human readable json.'''
   try:
     fitfile = fitparse.FitFile(str(filename))
-    print(get_sport(fitfile))
     x = {'sport': get_sport(fitfile), 'records': get_records(fitfile)}
     return json.dumps(x, indent=4, sort_keys=True, default=str)
   except Exception as ex:
-    print(filename)
-    print(ex)
+    print(f'{filename}: {ex}')
     exit(1)
 
-def save_fits_as_jsons(input_folder, output_folder):
+def save_fits_as_jsons(input_folder, output_folder, overwrite=False):
   for fitfile in Path(input_folder).iterdir():
     if fitfile.suffix == ".fit":
       output = fit2json(fitfile)
-      with (Path(output_folder) / fitfile.with_suffix('.json').name).open("w") as outfile:
-        outfile.write(output)
+      json_outputpath = Path(output_folder) / fitfile.with_suffix('.json').name
+      if not json_outputpath.exists() or overwrite:
+        with json_outputpath.open("w") as outfile:
+          outfile.write(output)
 
 if __name__ == '__main__':
   """Main."""

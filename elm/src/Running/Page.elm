@@ -6,6 +6,8 @@ module Running.Page exposing (view)
 -- import Browser.Navigation as Nav
 -- import Url
 
+import Tuple exposing (first, second)
+import List exposing (map)
 import Html
 import Html.Attributes exposing (class)
 import LineChart
@@ -41,11 +43,9 @@ view _ =
   Html.div
     [ class "container" ]
     [ plot .miles
-    , plot .zone1
-    , plot .zone2
-    , plot .zone3
-    , plot .zone4
-    , plot .zone5
+    , heartRateZones year1
+    , heartRateZones year2
+    , heartRateZones year3
     ]
 
 plot : (WeeklyRunning -> Float) -> Html.Html msg
@@ -67,6 +67,29 @@ plot selector =
     [ LineChart.line Colors.pink Dots.none "2018" year1
     , LineChart.line Colors.blue Dots.none "2019" year2
     , LineChart.line Colors.cyan Dots.none "2020" year3
+    ]
+
+heartRateZones : List WeeklyRunning -> Html.Html msg
+heartRateZones year =
+  LineChart.viewCustom
+    { y = Axis.default 450 "Heart Rate Zones" first
+    , x = Axis.default 700 "Week" second
+    , container = Container.styled "line-chart-1" [ ( "font-family", "monospace" ) ]
+    , interpolation = Interpolation.monotone
+    , intersection = Intersection.default
+    , legends = Legends.default
+    , events = Events.default
+    , junk = Junk.default
+    , grid = Grid.default
+    , area = Area.stacked 0.5
+    , line = Line.default
+    , dots = Dots.default
+    }
+    [ LineChart.line Colors.pink Dots.none "zone1" (map (\wr -> (wr.zone1, wr.week)) year)
+    , LineChart.line Colors.blue Dots.none "zone2" (map (\wr -> (wr.zone2, wr.week)) year)
+    , LineChart.line Colors.cyan Dots.none "zone3" (map (\wr -> (wr.zone3, wr.week)) year)
+    , LineChart.line Colors.red Dots.none "zone4" (map (\wr -> (wr.zone4, wr.week)) year)
+    , LineChart.line Colors.green Dots.none "zone5" (map (\wr -> (wr.zone5, wr.week)) year)
     ]
 
 -- DATA
