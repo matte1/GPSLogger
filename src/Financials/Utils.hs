@@ -1,7 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 -- | TODO
-module Utils
+module Financials.Utils
     ( Percentage(..)
     , getPercentage
     , convertAnnualReturnToMonthly

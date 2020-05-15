@@ -8,8 +8,6 @@ module Fitness.Garmin
     ( Activity(..)
     , Record(..)
     , Sport(..)
-    , Week(..)
-    , Year(..)
 
      -- * Data Extraction
     , unsafeTotalDistance
@@ -19,8 +17,8 @@ module Fitness.Garmin
     , changes
     , integrate
     , filterBySport
-    , groupActivitesByYearWeek
-    , groupActivitesByYearMonth
+    , getByYearAndWeek
+    , mapWithDay
 
       -- * File IO
     , readActivity
@@ -31,6 +29,8 @@ module Fitness.Garmin
 import Fitness.Utils
 
 import Data.Aeson hiding (pairs)
+import Data.Maybe ( fromMaybe )
+import Data.Time.Calendar ( Day )
 import Data.Time.Calendar.WeekDate
 import qualified Data.Map.Lazy as M
 import GHC.Generics ( Generic )
@@ -40,6 +40,8 @@ import qualified Data.Text as T
 import Data.Maybe (catMaybes)
 import qualified Data.ByteString.Lazy as B
 import PyF ( fmt )
+import Data.Time.LocalTime
+
 
 data Sport
   = Run
@@ -57,12 +59,15 @@ data Sport
   | Navigate
   | Bouldering
   | Strength
+  | RollOut
+  | ClimbingWall -- TODO(matte): Remove!
   deriving (Eq, Generic, Show)
 instance FromJSON Sport
 
 data Activity =
   Activity
-  { sport :: Sport
+  { filename :: String
+  , sport :: Sport
   , records :: [Record]
   } deriving (Show, Generic)
 instance FromJSON Activity
@@ -136,28 +141,20 @@ getActivitiesFromDir path = do
 filterBySport :: [Sport] -> [Activity] -> [Activity]
 filterBySport sports = filter (\activity -> sport activity `elem` sports)
 
-newtype Week = Week { getWeek :: Int } deriving (Eq, Ord, Show)
-newtype Month = Month { getMonth :: Int } deriving (Eq, Ord, Show)
-newtype Year = Year { getYear :: Int } deriving (Eq, Ord, Show)
+getByYearAndWeek :: Integer -> Int -> M.Map Day [a] -> [(Int, [a])]
+getByYearAndWeek year week map' =
+  [ ( day
+    , fromMaybe [] (map' M.!? fromWeekDate year week day)
+    )
+  | day <- [1..7]
+  ]
 
-groupActivitesByYearWeek :: [Activity] -> M.Map (Year, Week) [Activity]
-groupActivitesByYearWeek activities = foldl insertBy M.empty activities
+mapWithDay :: [Activity] -> M.Map Day [Activity]
+mapWithDay activities = foldl insertBy M.empty activities
   where
-    insertBy :: M.Map (Year, Week) [Activity] -> Activity -> M.Map (Year, Week) [Activity]
-    insertBy m0 activity = appendItemToListInMap (activityToYearWeek activity) activity m0
-
-    activityToYearWeek :: Activity -> (Year, Week)
-    activityToYearWeek activity =
-      let (year, week, _) = toWeekDate . utctDay . timestamp . head $ records activity
-      in (Year $ fromIntegral year, Week week)
-
-groupActivitesByYearMonth :: [Activity] -> M.Map (Year, Month) [Activity]
-groupActivitesByYearMonth activities = foldl insertBy M.empty activities
-  where
-    insertBy :: M.Map (Year, Month) [Activity] -> Activity -> M.Map (Year, Month) [Activity]
-    insertBy m0 activity = appendItemToListInMap (activityToYearMonth activity) activity m0
-
-    activityToYearMonth :: Activity -> (Year, Month)
-    activityToYearMonth activity =
-      let (year, week, _) = toWeekDate . utctDay . timestamp . head $ records activity
-      in (Year $ fromIntegral year, Month $ week `mod` 4)
+    insertBy :: M.Map Day [Activity] -> Activity -> M.Map Day [Activity]
+    insertBy m0 activity =
+      appendItemToListInMap
+      (getPstDay $ timestamp . last $ records activity)
+      m0
+      activity

@@ -18,11 +18,11 @@ class Mounter():
     return self
 
   def _attemp_to_mount(self):
-    for i in range(3):
-      time.sleep(1)
-      proc = subprocess.run(['sudo', 'mount', self.dev, self.mnt])
-      if proc.returncode == 0:
-        return True
+    '''todo'''
+    time.sleep(5)
+    proc = subprocess.run(['sudo', 'mount', self.dev, self.mnt])
+    if proc.returncode == 0:
+      return True
     self.logfile.write(f'Failed to mount {self.dev} to {self.mnt}!\n{proc.stderr}')
     return False
 
@@ -30,8 +30,7 @@ class Mounter():
     """Close the smtp server."""
     subprocess.run(['sudo', 'umount', self.mnt])
 
-if __name__ == '__main__':
-
+def rsync():
   local = Path('/home/matt/projects/LifeOfMatt/data/garmin/fit/')
   assert local.exists(), f'The LifeOfMatt directory doesn\'t at {LIFE_OF_MATT}.'
 
@@ -55,5 +54,6 @@ if __name__ == '__main__':
 
       logfile.write(f'Success!\n')
 
-  # Attempt to unmount the garmin.
+if __name__ == '__main__':
+  rsync()
   exit(0)

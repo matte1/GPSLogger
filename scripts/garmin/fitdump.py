@@ -70,13 +70,13 @@ def fit2json(filename):
   '''Convert a fit file into a human readable json.'''
   try:
     fitfile = fitparse.FitFile(str(filename))
-    x = {'sport': get_sport(fitfile), 'records': get_records(fitfile)}
+    x = {'sport': get_sport(fitfile), 'records': get_records(fitfile), 'filename': filename}
     return json.dumps(x, indent=4, sort_keys=True, default=str)
   except Exception as ex:
     print(f'{filename}: {ex}')
     exit(1)
 
-def save_fits_as_jsons(input_folder, output_folder, overwrite=False):
+def save_fits_as_jsons(input_folder, output_folder, overwrite=False, verbose=True):
   for fitfile in Path(input_folder).iterdir():
     if fitfile.suffix == ".fit":
       output = fit2json(fitfile)
@@ -84,6 +84,7 @@ def save_fits_as_jsons(input_folder, output_folder, overwrite=False):
       if not json_outputpath.exists() or overwrite:
         with json_outputpath.open("w") as outfile:
           outfile.write(output)
+          print(f'Wrote: {str(json_outputpath)}')
 
 if __name__ == '__main__':
   """Main."""

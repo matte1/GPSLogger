@@ -1,7 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 -- | TODO
-module Investments
+module Financials.Investments
     ( Accounts(..)
       -- TODO remove this export!
     , ContributionLimit(..)
@@ -20,7 +20,7 @@ module Investments
     , resetAllContributions
     ) where
 
-import Utils
+import Financials.Utils
 
 -- | Investment Account Types
 data Roth

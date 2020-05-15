@@ -9,8 +9,9 @@
 -- 2) Generate training plans algoithmically..
 
 module Fitness.Running
-    ( mkRunningMetrics
-    , getRunningMetrics
+    ( RunningMetrics(..)
+    , mkRunningMetrics
+    , concatRunningMetrics
     ) where
 
 import Fitness.Garmin
@@ -33,6 +34,7 @@ data RunningMetrics
     , elevationLoss :: Double
     , totalHeartBeats :: Double
     , totalTime :: Double
+    , rmFilename :: String
     }
 instance Show RunningMetrics where
   show rm = [fmt|\
@@ -40,7 +42,8 @@ miles: {(meters rm / 1600):.2}
 metersPerHeartBeat: {(metersPerHeartBeat rm * 100):.2}
 timeInHrZones: {show $ toHoursMins <$> timeInHrZones rm}
 elevationGain: {(elevationGain rm):.2}
-totalTime: toHoursMins (totalTime rm)
+totalTime: {toHoursMins (totalTime rm)}
+filename: {rmFilename rm}
 |]
 instance Semigroup RunningMetrics where
   (<>) rm1 rm2 =
@@ -52,7 +55,13 @@ instance Semigroup RunningMetrics where
     , elevationLoss = elevationLoss rm1 + elevationLoss rm2
     , totalHeartBeats = totalHeartBeats rm1 + totalHeartBeats rm2
     , totalTime = totalTime rm1 + totalTime rm2
+    , rmFilename = rmFilename rm1 <> " : " <> rmFilename rm2
     }
+
+concatRunningMetrics :: [RunningMetrics] -> RunningMetrics
+concatRunningMetrics = foldl (<>) emptyRunningMetric
+  where
+    emptyRunningMetric = RunningMetrics 0 0 (pure 0) 0 0 0 0 ""
 
 mkRunningMetrics :: Activity -> RunningMetrics
 mkRunningMetrics activity = running
@@ -66,18 +75,10 @@ mkRunningMetrics activity = running
       , elevationLoss = sum $ (min 0) <$> elevationChanges
       , totalHeartBeats = integrate rs heartRateOrZero
       , totalTime = dt (timestamp $ head rs, timestamp $ last rs)
+      , rmFilename = filename activity
       }
     elevationChanges = changes rs altitudeOrZero
     rs = records activity
-
-getRunningMetrics :: IO (M.Map (Year, Week) [RunningMetrics])
-getRunningMetrics = do
-  activities <- getActivitiesFromDir fitFileDir
-  let runningMetrics =
-        M.map (fmap mkRunningMetrics) $
-        groupActivitesByYearWeek $ filterBySport [Run, TrailRun] activities
-  pure runningMetrics
-
 
 -- getHeartBeatsOfActivites :: [Activity] -> Double
 -- getHeartBeatsOfActivites = sum . fmap (flip integrateRecords getHeartRateOrZero) . fmap records

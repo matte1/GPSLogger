@@ -1,8 +1,8 @@
-module Main where
+module Financials.Example where
 
-import Investments
-import Tax
-import Utils
+import Financials.Investments
+import Financials.Tax
+import Financials.Utils
 
 myAccounts :: Accounts
 myAccounts =
@@ -60,8 +60,8 @@ runMonth accounts income =
       contribute (ContributionLimit 1e9) (Percentage 50) Nothing (personal compoundedAccounts)
       postTaxIncome
 
-main :: IO ()
-main = do
+example :: IO ()
+example = do
   let myIncomes = replicate 12 (Income 11000)
       year1 = foldl runMonth myAccounts myIncomes
       year2 = foldl runMonth (resetAllContributions year1) myIncomes

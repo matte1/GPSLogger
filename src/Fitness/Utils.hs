@@ -5,13 +5,18 @@
 module Fitness.Utils
     ( appendItemToListInMap
     , average
-    , doubleFromNominalDiffTime
     , pairs
+
+      -- * Time
+    , doubleFromNominalDiffTime
     , dt
     , toHoursMins
+    , getPstDay
     ) where
 
 import qualified Data.Map.Lazy as M
+import Data.Time.LocalTime
+import Data.Time.Calendar ( Day )
 import Data.Time.Clock ( UTCTime(..), NominalDiffTime(..), diffUTCTime)
 import qualified Data.Text as T
 import PyF ( fmt )
@@ -20,8 +25,8 @@ pairs :: [a] -> [(a, a)]
 pairs [] = []
 pairs xs = zip xs (tail xs)
 
-appendItemToListInMap :: Ord k => k -> a -> M.Map k [a] -> M.Map k [a]
-appendItemToListInMap key value map' =
+appendItemToListInMap :: Ord k => k -> M.Map k [a] -> a -> M.Map k [a]
+appendItemToListInMap key map' value =
   case (map' M.!? key) of
     Just vs -> M.insert key (value:vs) map'
     Nothing -> M.insert key [value] map'
@@ -40,4 +45,11 @@ dt (t1, t2) = doubleFromNominalDiffTime $ diffUTCTime t2 t1
 toHoursMins :: Double -> T.Text
 toHoursMins seconds =
   let (hours, mins) = properFraction $ seconds / 3600 :: (Int, Double)
-  in [fmt|{hours}:{(mins*60):.2}|]
+      mins' = round (mins * 60) :: Int
+  in [fmt|{hours}.{mins'}|]
+
+getPstDay :: UTCTime -> Day
+getPstDay utc =
+  let pstTimeZone :: TimeZone
+      pstTimeZone = TimeZone (-8 * 60) False "PST"
+  in localDay $ utcToLocalTime pstTimeZone utc

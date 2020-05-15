@@ -1,10 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Lib
-    ( Income(..)
-    , Percentage(..)
-    , PreTax, PostTax
-    , payTaxes
+module Financials.Lib
+    (
+    --   Income(..)
+    -- , Percentage(..)
+    -- , PreTax, PostTax
+    -- , payTaxes
     ) where
 
 -- data Portfolio =

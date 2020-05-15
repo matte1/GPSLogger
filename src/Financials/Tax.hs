@@ -1,10 +1,10 @@
 -- | Only two things in life are certain.
-module Tax
+module Financials.Tax
     ( payTaxes
     ) where
 
-import Investments ( PreTax, PostTax, Income(..) )
-import Utils
+import Financials.Investments ( PreTax, PostTax, Income(..) )
+import Financials.Utils
 
 -- TODO (matte): Add joint accounts, PROGRESSIVE TAX SYSTEM
 payTaxes :: Income PreTax -> Income PostTax
