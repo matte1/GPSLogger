@@ -31,14 +31,19 @@ module Running.Page exposing (view)
 
 import Plotting.Plotting exposing (simpleLinePlot)
 
-import Html
+import Html exposing (..)
 import Html.Attributes exposing (class)
 
 view : model -> Html.Html msg
 view _ =
   Html.div
     [ class "container" ]
-    [ simpleLinePlot "Week 20" ("Day", .day) ("Miles", .miles) thisWeek
+    [ h1 [] [ text "Week 20" ]
+    , ol []
+      [ li [] [ text "Total Miles: {toMiles . sum $ meters . snd <$> thisWeek}" ]
+      , li [] [ text "Total Time: {toHoursMins . sum $ totalTime . snd <$> thisWeek}" ]
+      ]
+    , simpleLinePlot "Week 20" ("Day", .day) ("Miles", .miles) thisWeek
     ]
 
 type alias {elmTypeName} =
@@ -54,6 +59,8 @@ thisWeek =
 
 |]
       where
+        toMiles meters = meters / 1600
+
         elmTypeName :: T.Text
         elmTypeName = "RunningMetrics"
 
@@ -69,4 +76,4 @@ thisWeek =
           where
             -- hrZones = T.intercalate " " $ F.toList show <$> (toHoursMins <$> timeInHrZones rm)
             prettyTotalTime = toHoursMins $ totalTime rm
-            miles = meters rm / 1600
+            miles = toMiles $ meters rm
