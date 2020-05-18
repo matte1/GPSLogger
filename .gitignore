@@ -3,3 +3,4 @@ data/gaia/**
 data/garmin/jsons/**
 scripts/garmin/__pycache__/**
 src/Elm/elm-stuff/**
+src/Elm/Running/Page.elm

@@ -13,28 +13,16 @@ import TypedSvg.Attributes.InPx exposing (height, width, x, y)
 import TypedSvg.Core exposing (Svg, text)
 import TypedSvg.Types exposing (AnchorAlignment(..), FontWeight(..), Paint(..), Transform(..))
 
+stackedBarChart : List Int -> List (String, List Float) -> Html.Html msg
+stackedBarChart xs samples =
+  let config : StackConfig String
+      config =
+          { data = samples
+          , offset = Shape.stackOffsetNone
+          , order = identity
+          }
 
-stackedBarChart : Html.Html msg
-stackedBarChart = viewStackedBarChart (Shape.stack config)
-
-type alias Day = Int
-
-series : List { label : String, accessor : Workout -> Float }
-series =
-    [ { label = "Running"
-      , accessor = .running
-      }
-    , { label = "Climbing"
-      , accessor = .climbing
-      }
-    , { label = "Stabilizers"
-      , accessor = .stabilizers
-      }
-    ]
-
-
-samples : List ( String, List Float )
-samples = List.map (\{ label, accessor } -> ( label, List.map accessor workouts )) series
+  in viewStackedBarChart xs (Shape.stack config)
 
 w : Float
 w = 990
@@ -50,20 +38,10 @@ padding =
     , bottom = 60
     }
 
-
-config : StackConfig String
-config =
-    { data = samples
-    , offset = Shape.stackOffsetNone
-    , order = identity
-    }
-
-
 reverseViridis : Float -> Color
 reverseViridis progression =
     -- stylistic choice: the larger boxes look better in brighter colors, so invert the interpolator
     Scale.Color.viridisInterpolator (1 - progression)
-
 
 colors : Int -> List Color
 colors size =
@@ -75,7 +53,7 @@ colors size =
     List.range 0 (size - 1)
         |> List.map (colorScale << toFloat)
 
-column : BandScale Day -> ( Day, List ( Float, Float ) ) -> Svg msg
+column : BandScale Int -> ( Int, List ( Float, Float ) ) -> Svg msg
 column xScale ( year, values ) =
     let block color ( upperY, lowerY ) =
           rect
@@ -88,9 +66,9 @@ column xScale ( year, values ) =
               []
     in g [ class [ "column" ] ] (List.map2 block (colors (List.length values)) values)
 
-labelBarInStackedBars : BandScale Day -> ContinuousScale Float -> List Day -> String -> List (Float, Float) -> Svg msg
+labelBarInStackedBars : BandScale Int -> ContinuousScale Float -> List Int -> String -> List (Float, Float) -> Svg msg
 labelBarInStackedBars xScale yScale xs label lowHighs =
-  let makeLabel : Day -> (Float, Float) -> Svg msg
+  let makeLabel : Int -> (Float, Float) -> Svg msg
       makeLabel day (yLow, yHigh) =
         let yMiddle = (yHigh-yLow) / 2 + yLow
         in text_
@@ -103,19 +81,16 @@ labelBarInStackedBars xScale yScale xs label lowHighs =
        , textAnchor AnchorEnd
        ] <| List.map2 makeLabel xs lowHighs
 
-viewStackedBarChart : StackResult String -> Svg msg
-viewStackedBarChart { values, labels, extent } =
-    let days : List Day
-        days = List.map .day workouts
+viewStackedBarChart : List Int -> StackResult String -> Svg msg
+viewStackedBarChart xs { values, labels, extent } =
+    let renderedLabels = List.map2 (labelBarInStackedBars xScale yScale xs) labels values
 
-        renderedLabels = List.map2 (labelBarInStackedBars xScale yScale days) labels values
-
-        xScale : BandScale Day
+        xScale : BandScale Int
         xScale =
           Scale.band
           { defaultBandConfig | paddingInner = 0.1, paddingOuter = 0.2 }
           ( 0, w - (padding.top + padding.bottom) )
-          days
+          xs
 
         yScale : ContinuousScale Float
         yScale =
@@ -137,7 +112,7 @@ viewStackedBarChart { values, labels, extent } =
             [ Axis.left [] yScale ]
 
         barChart =
-          let bars = List.map (column xScale) (List.map2 (\a b -> ( a, b )) days scaledValues)
+          let bars = List.map (column xScale) (List.map2 (\a b -> ( a, b )) xs scaledValues)
           in g [ transform [ Translate padding.left padding.top ] ] bars
 
     in svg [ viewBox 0 0 w h ]
@@ -149,21 +124,3 @@ viewStackedBarChart { values, labels, extent } =
 
 zip : List a -> List b -> List (a, b)
 zip xs ys = List.map2 Tuple.pair xs ys
-
-type alias Workout =
-    { day : Int
-    , running : Float
-    , climbing : Float
-    , stabilizers : Float
-    }
-
-workouts : List Workout
-workouts =
-    [ Workout 2 2.2 0 0.5
-    , Workout 3 1.5 2.3 0.5
-    , Workout 4 0 0 0
-    , Workout 5 0 0 0
-    , Workout 6 0 0 0
-    , Workout 7 0 0 0
-    , Workout 8 0 0 0
-    ]

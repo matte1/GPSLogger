@@ -18,7 +18,43 @@ view _ =
       ]
     -- , simpleLinePlot "Week 20" ("Day", .day) ("Miles", .miles) thisWeek
     , stackedBarChart
+        (List.map .day workouts)
+        (List.map (\{ label, accessor } -> ( label, List.map accessor workouts )) series)
     ]
+
+
+type alias Day = Int
+type alias Workout =
+    { day : Day
+    , running : Float
+    , climbing : Float
+    , stabilizers : Float
+    }
+
+series : List { label : String, accessor : Workout -> Float }
+series =
+    [ { label = "Running"
+      , accessor = .running
+      }
+    , { label = "Climbing"
+      , accessor = .climbing
+      }
+    , { label = "Stabilizers"
+      , accessor = .stabilizers
+      }
+    ]
+
+workouts : List Workout
+workouts =
+    [ Workout 2 2.2 0 0.5
+    , Workout 3 1.5 2.3 0.5
+    , Workout 4 0 0 0
+    , Workout 5 0 0 0
+    , Workout 6 0 0 0
+    , Workout 7 0 0 0
+    , Workout 8 0 0 0
+    ]
+
 
 type alias RunningMetrics =
   { day : Float
