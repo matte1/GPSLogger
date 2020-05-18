@@ -60,6 +60,8 @@ data Sport
   | Bouldering
   | Strength
   | RollOut
+  | WristStabilizer
+  | ShoulderStabili
   | ClimbingWall -- TODO(matte): Remove!
   deriving (Eq, Generic, Show)
 instance FromJSON Sport
