@@ -10,6 +10,7 @@ module Fitness.Garmin
     , Sport(..)
 
      -- * Data Extraction
+    , totalActivityTime
     , unsafeTotalDistance
     , altitudeOrZero
     , distanceOrZero
@@ -63,7 +64,7 @@ data Sport
   | WristStabilizer
   | ShoulderStabili
   | ClimbingWall -- TODO(matte): Remove!
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Ord, Bounded, Generic, Show)
 instance FromJSON Sport
 
 data Activity =
@@ -88,6 +89,12 @@ data Record =
   , timestamp          :: UTCTime
   } deriving (Show, Read, Generic)
 instance FromJSON Record
+
+-- Retrieves the time difference between the first and last record in an activity
+totalActivityTime :: Activity -> Double
+totalActivityTime activity =
+  let rs = records activity
+  in dt (timestamp . head $ rs, timestamp . last $ rs)
 
 unsafeTotalDistance :: Activity -> Double
 unsafeTotalDistance activity

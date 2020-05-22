@@ -46,7 +46,7 @@ toHoursMins :: Double -> T.Text
 toHoursMins seconds =
   let (hours, mins) = properFraction $ seconds / 3600 :: (Int, Double)
       mins' = round (mins * 60) :: Int
-  in [fmt|{hours}.{mins'}|]
+  in [fmt|{hours}:{mins':.2}|]
 
 getPstDay :: UTCTime -> Day
 getPstDay utc =

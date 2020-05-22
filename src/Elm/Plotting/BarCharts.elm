@@ -2,13 +2,13 @@ module Plotting.BarCharts exposing (stackedBarChart)
 
 import Html
 import Axis
-import Color exposing (Color)
+import Color exposing (Color, white)
 import List.Extra as List
 import Scale exposing (BandConfig, BandScale, ContinuousScale, defaultBandConfig)
 import Scale.Color
 import Shape exposing (StackConfig, StackResult)
 import TypedSvg exposing (g, rect, svg, text_, tspan)
-import TypedSvg.Attributes exposing (class, fill, fontWeight, stroke, style, textAnchor, transform, viewBox)
+import TypedSvg.Attributes exposing (class, color, fill, fontWeight, stroke, style, textAnchor, transform, viewBox)
 import TypedSvg.Attributes.InPx exposing (height, width, x, y)
 import TypedSvg.Core exposing (Svg, text)
 import TypedSvg.Types exposing (AnchorAlignment(..), FontWeight(..), Paint(..), Transform(..))
@@ -41,7 +41,7 @@ padding =
 reverseViridis : Float -> Color
 reverseViridis progression =
     -- stylistic choice: the larger boxes look better in brighter colors, so invert the interpolator
-    Scale.Color.viridisInterpolator (1 - progression)
+    Scale.Color.viridisInterpolator progression
 
 colors : Int -> List Color
 colors size =
@@ -54,10 +54,10 @@ colors size =
         |> List.map (colorScale << toFloat)
 
 column : BandScale Int -> ( Int, List ( Float, Float ) ) -> Svg msg
-column xScale ( year, values ) =
+column xScale ( xband, values ) =
     let block color ( upperY, lowerY ) =
           rect
-              [ x <| Scale.convert xScale year
+              [ x <| Scale.convert xScale xband
               , y <| lowerY
               , width <| Scale.bandwidth xScale
               , height <| (abs <| upperY - lowerY)
@@ -70,14 +70,17 @@ labelBarInStackedBars : BandScale Int -> ContinuousScale Float -> List Int -> St
 labelBarInStackedBars xScale yScale xs label lowHighs =
   let makeLabel : Int -> (Float, Float) -> Svg msg
       makeLabel day (yLow, yHigh) =
-        let yMiddle = (yHigh-yLow) / 2 + yLow
+        let yMiddle = (yHigh - yLow) / 2 + yLow
+            -- xoffset = 135
         in text_
             [ transform [ Translate (Scale.convert xScale day) (Scale.convert yScale yMiddle) ]
             , x 135
-            , y 45
+            , y (30 + 3)
+            -- , color white
+            , fill <| Paint white
             ]
             [ text <| if yHigh - yLow == 0 then "" else label ]
-  in g [ style "font: bold 12px sans-serif; font-variant-numeric: tabular-nums;"
+  in g [ style "font: bold 8px sans-serif; font-variant-numeric: tabular-nums;"
        , textAnchor AnchorEnd
        ] <| List.map2 makeLabel xs lowHighs
 
