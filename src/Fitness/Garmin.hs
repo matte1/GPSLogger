@@ -20,6 +20,7 @@ module Fitness.Garmin
     , filterBySport
     , getByYearAndWeek
     , mapWithDay
+    , mapWithYear
 
       -- * File IO
     , readActivity
@@ -62,8 +63,9 @@ data Sport
   | Strength
   | RollOut
   | WristStabilizer
-  | ShoulderStabili
-  | ClimbingWall -- TODO(matte): Remove!
+  | ShoulderStabili -- TODO Remove!
+  | ClimbingWall -- TODO Remove!
+  | HangboardMinimu -- TODO: Rename
   deriving (Eq, Ord, Bounded, Generic, Show)
 instance FromJSON Sport
 
@@ -91,6 +93,9 @@ data Record =
 instance FromJSON Record
 
 -- Retrieves the time difference between the first and last record in an activity
+-- BUG: This calculates time by looking at the start time and end time. However; if you
+-- paused during the workout you might get a total activity time much longer than you
+-- expected.
 totalActivityTime :: Activity -> Double
 totalActivityTime activity =
   let rs = records activity
@@ -157,6 +162,18 @@ getByYearAndWeek year week map' =
     )
   | day <- [1..7]
   ]
+
+mapWithYear :: [Activity] -> M.Map Integer [Activity]
+mapWithYear activities = foldl insertBy M.empty activities
+  where
+    insertBy :: M.Map Integer [Activity] -> Activity -> M.Map Integer [Activity]
+    insertBy m0 activity =
+      appendItemToListInMap
+      (getYear . toWeekDate . getPstDay . timestamp . last $ records activity)
+      m0
+      activity
+      where
+        getYear (year, _, _) = year
 
 mapWithDay :: [Activity] -> M.Map Day [Activity]
 mapWithDay activities = foldl insertBy M.empty activities

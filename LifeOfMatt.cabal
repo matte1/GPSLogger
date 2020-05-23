@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 831b07fc660b35d9adbf8c471ac601c12509f0d9e135aea76c1ebc6defa5ffe5
+-- hash: 893a4aea9b3f70fca3abb46d0347a8c14c36b5294084ac00c3cb9bb33a9af5c6
 
 name:           LifeOfMatt
 version:        0.1.0.0
@@ -26,6 +26,7 @@ source-repository head
 
 library
   exposed-modules:
+      Elm.Render.Fitness
       Elm.Render.Render
       Elm.Render.Running
       Financials.Example

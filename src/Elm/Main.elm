@@ -76,5 +76,5 @@ view model =
         }
       Running ->
         { title = "Running"
-        , body = [Running.view model]
+        , body = [Running.view]
         }

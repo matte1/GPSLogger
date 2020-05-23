@@ -20,7 +20,7 @@ import qualified Data.Map.Lazy as M
 renderFitnessPage :: UTCTime -> [Activity] -> IO T.Text
 renderFitnessPage currentTime activities = do
   let (year, week, _) = toWeekDate (getPstDay currentTime)
-  pure $ render $ getByYearAndWeek year 20 (mapWithDay activities)
+  pure $ render $ getByYearAndWeek year week (mapWithDay activities)
   where
     render :: [(Int, [Activity])] -> T.Text
     render activitiesByDay = [fmt|\
@@ -33,6 +33,22 @@ import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (class, css, href, src)
 import Html.Styled.Events exposing (onClick)
 
+selector =
+  div
+  [ css
+    [ position absolute
+    , left (px 205)
+    , bottom (px -200)
+    ]
+  ]
+  [ select []
+    [ option [] [ text "A" ]
+    , option [] [ text "B" ]
+    , option [] [ text "C" ]
+    , option [] [ text "D" ]
+    ]
+  ]
+
 view : Html msg
 view =
   div
@@ -42,9 +58,19 @@ view =
         , padding (px 20)
         ]
       ] [ text "{show $ getPstDay currentTime}" ]
-  , stackedBarChart
-     (List.map .day data)
-     (List.map (\\{{ label, accessor }} -> ( label, List.map accessor data )) series)
+  , fromUnstyled <|
+     stackedBarChart
+       (List.map .day data)
+       (List.map (\\{{ label, accessor }} -> ( label, List.map accessor data )) series)
+  , form
+    [ css [ padding (px 20)] ]
+    [ select  []
+      [ option [] [ text "A" ]
+      , option [] [ text "B" ]
+      , option [] [ text "C" ]
+      , option [] [ text "D" ]
+      ]
+    ]
   ]
 
 type alias {workoutTypeName} =

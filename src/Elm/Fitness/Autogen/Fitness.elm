@@ -7,6 +7,22 @@ import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (class, css, href, src)
 import Html.Styled.Events exposing (onClick)
 
+selector =
+  div
+  [ css
+    [ position absolute
+    , left (px 205)
+    , bottom (px -200)
+    ]
+  ]
+  [ select []
+    [ option [] [ text "A" ]
+    , option [] [ text "B" ]
+    , option [] [ text "C" ]
+    , option [] [ text "D" ]
+    ]
+  ]
+
 view : Html msg
 view =
   div
@@ -15,34 +31,33 @@ view =
         [ textAlign center
         , padding (px 20)
         ]
-      ] [ text "2020-05-20" ]
+      ] [ text "2020-05-23" ]
   , fromUnstyled <|
      stackedBarChart
        (List.map .day data)
        (List.map (\{ label, accessor } -> ( label, List.map accessor data )) series)
   , form
-    []
-    -- [ input []
-        [ select  []
-          [ option [] [ text "a" ]
-          , option [] [ text "b" ]
-          , option [] [ text "c" ]
-          , option [] [ text "d" ]
-          ]
-        ]
-    -- ]
+    [ css [ padding (px 20)] ]
+    [ select  []
+      [ option [] [ text "A" ]
+      , option [] [ text "B" ]
+      , option [] [ text "C" ]
+      , option [] [ text "D" ]
+      ]
+    ]
   ]
 
 type alias Workout =
   { day : Int
-  , run: Float
-  , trailrun: Float
-  , abs: Float
-  , yoga: Float
-  , bouldering: Float
-  , rollout: Float
-  , wriststabilizer: Float
-  , shoulderstabili: Float
+  , run: Float 
+  , trailrun: Float 
+  , abs: Float 
+  , yoga: Float 
+  , bouldering: Float 
+  , rollout: Float 
+  , wriststabilizer: Float 
+  , shoulderstabili: Float 
+  , hangboardminimu: Float
   }
 
 series : List { label : String, accessor : Workout -> Float }
@@ -55,14 +70,16 @@ series =
   , {label = "RollOut", accessor = .rollout}
   , {label = "WristStabilizer", accessor = .wriststabilizer}
   , {label = "ShoulderStabili", accessor = .shoulderstabili}
+  , {label = "HangboardMinimu", accessor = .hangboardminimu}
   ]
 
 data =
-  [ Workout 1 0.00 1.69 0.00 0.00 0.00 0.12 0.00 0.00
-  , Workout 2 0.00 0.99 0.21 0.00 0.00 0.00 0.00 0.00
-  , Workout 3 0.00 1.34 0.20 0.00 0.00 0.16 0.21 8.17e-02
-  , Workout 4 1.53 0.00 0.00 0.93 0.33 0.11 0.21 0.00
-  , Workout 5 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
-  , Workout 6 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
-  , Workout 7 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  [ Workout 1 1.82 0.00 0.35 0.00 0.75 0.15 0.21 0.21 0.00
+  , Workout 2 1.17 0.00 0.00 0.00 0.00 0.29 0.00 0.00 0.00
+  , Workout 3 0.00 1.33 0.21 0.00 0.00 0.00 0.20 0.20 0.16
+  , Workout 4 1.53 0.00 0.00 0.97 0.00 0.00 0.00 0.00 0.00
+  , Workout 5 1.75 0.00 0.00 0.00 0.00 0.12 0.00 0.00 0.00
+  , Workout 6 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  , Workout 7 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
   ]
+

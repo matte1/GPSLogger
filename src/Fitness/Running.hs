@@ -43,7 +43,6 @@ metersPerHeartBeat: {(metersPerHeartBeat rm * 100):.2}
 timeInHrZones: {show $ toHoursMins <$> timeInHrZones rm}
 elevationGain: {(elevationGain rm):.2}
 totalTime: {toHoursMins (totalTime rm)}
-filename: {rmFilename rm}
 |]
 instance Semigroup RunningMetrics where
   (<>) rm1 rm2 =
