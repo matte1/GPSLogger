@@ -1,12 +1,14 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Financials.Lib
-    (
-    --   Income(..)
-    -- , Percentage(..)
-    -- , PreTax, PostTax
-    -- , payTaxes
-    ) where
+  (
+  )
+where
+
+--   Income(..)
+-- , Percentage(..)
+-- , PreTax, PostTax
+-- , payTaxes
 
 -- data Portfolio =
 --   Portfolio
@@ -25,8 +27,6 @@ module Financials.Lib
 --   , c401Contribution :: Percentage
 --   , c401Matching :: Percentage
 --   }
-
-
 
 -- stepMonth :: Double -> Investment401K -> Investment401K
 -- stepMonth income i401k = traditional401k

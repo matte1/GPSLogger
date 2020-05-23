@@ -7,26 +7,26 @@ import Financials.Utils
 myAccounts :: Accounts
 myAccounts =
   Accounts
-  { tradinal401k =
-      InvestmentAccount
-      { principal = 0
-      , earnings = 0
-      , contributionsYTD = 0
-      }
-  , rothIRA =
-      InvestmentAccount
-      { principal = 0
-      , earnings = 0
-      , contributionsYTD = 0
-      }
-  , personal =
-      InvestmentAccount
-      { principal = 0
-      , earnings = 0
-      , contributionsYTD = 0
-      }
-  , savings = Income 0
-  }
+    { tradinal401k =
+        InvestmentAccount
+          { principal = 0,
+            earnings = 0,
+            contributionsYTD = 0
+          },
+      rothIRA =
+        InvestmentAccount
+          { principal = 0,
+            earnings = 0,
+            contributionsYTD = 0
+          },
+      personal =
+        InvestmentAccount
+          { principal = 0,
+            earnings = 0,
+            contributionsYTD = 0
+          },
+      savings = Income 0
+    }
 
 max401ContributionRate :: Percentage
 max401ContributionRate = Percentage 50
@@ -37,28 +37,33 @@ averageMonthlyGrowth = convertAnnualReturnToMonthly (Percentage 7)
 runMonth :: Accounts -> Income PreTax -> Accounts
 runMonth accounts income =
   compoundedAccounts
-  { tradinal401k = newTraditional401k
-  , personal = newPersonal
-  , savings = savings compoundedAccounts + remainingIncomePostTax
-  }
+    { tradinal401k = newTraditional401k,
+      personal = newPersonal,
+      savings = savings compoundedAccounts + remainingIncomePostTax
+    }
   where
     compoundedAccounts =
       Accounts
-      { tradinal401k = compound (tradinal401k accounts) averageMonthlyGrowth
-      , rothIRA = compound (rothIRA accounts) averageMonthlyGrowth
-      , personal = compound (personal accounts) averageMonthlyGrowth
-      , savings = savings accounts
-      }
-
+        { tradinal401k = compound (tradinal401k accounts) averageMonthlyGrowth,
+          rothIRA = compound (rothIRA accounts) averageMonthlyGrowth,
+          personal = compound (personal accounts) averageMonthlyGrowth,
+          savings = savings accounts
+        }
     (remainingIncomePreTax, newTraditional401k) =
-      contribute limitTrad401K max401ContributionRate (Just $ Percentage 50)
-      (tradinal401k compoundedAccounts) income
-
+      contribute
+        limitTrad401K
+        max401ContributionRate
+        (Just $ Percentage 50)
+        (tradinal401k compoundedAccounts)
+        income
     postTaxIncome = payTaxes remainingIncomePreTax
-
     (remainingIncomePostTax, newPersonal) =
-      contribute (ContributionLimit 1e9) (Percentage 50) Nothing (personal compoundedAccounts)
-      postTaxIncome
+      contribute
+        (ContributionLimit 1e9)
+        (Percentage 50)
+        Nothing
+        (personal compoundedAccounts)
+        postTaxIncome
 
 example :: IO ()
 example = do
@@ -83,12 +88,9 @@ example = do
       year18 = foldl runMonth (resetAllContributions year17) myIncomes
       year19 = foldl runMonth (resetAllContributions year18) myIncomes
       year20 = foldl runMonth (resetAllContributions year19) myIncomes
-
   print "Year 10"
   print year10
-
   putStrLn "Year 15"
   print year15
-
   putStrLn "Year 20"
   print year20
