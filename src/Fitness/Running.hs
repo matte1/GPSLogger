@@ -14,11 +14,6 @@ module Fitness.Running
   )
 where
 
-import qualified Data.Map as M
-import Data.Maybe (catMaybes)
-import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
-import Data.Time.Clock (NominalDiffTime (..))
 import Fitness.Garmin
 import Fitness.HeartRate
 import Fitness.Utils

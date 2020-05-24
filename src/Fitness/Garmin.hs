@@ -33,12 +33,10 @@ import Data.Aeson hiding (pairs)
 import qualified Data.ByteString.Lazy as B
 import qualified Data.Map.Lazy as M
 import Data.Maybe (fromMaybe)
-import Data.Maybe (catMaybes)
 import qualified Data.Text as T
 import Data.Time.Calendar (Day)
 import Data.Time.Calendar.WeekDate
-import Data.Time.Clock (NominalDiffTime (..), UTCTime (..), diffUTCTime)
-import Data.Time.LocalTime
+import Data.Time.Clock (UTCTime (..))
 import Fitness.Utils
 import GHC.Generics (Generic)
 import PyF (fmt)
@@ -128,14 +126,14 @@ altitudeOrZero Record {altitude = Just d} = d
 altitudeOrZero Record {altitude = Nothing} = 0
 
 integrate :: [Record] -> (Record -> Double) -> Double
-integrate records getter =
-  foldl (\accum (r, dt) -> accum + getter r * dt) 0 (zip records dts)
+integrate rs getter =
+  foldl (\accum (r, timeDiff) -> accum + getter r * timeDiff) 0 (zip rs dts)
   where
     dts :: [Double]
-    dts = dt . (\(r1, r2) -> (timestamp r1, timestamp r2)) <$> pairs records
+    dts = dt . (\(r1, r2) -> (timestamp r1, timestamp r2)) <$> pairs rs
 
 changes :: [Record] -> (Record -> Double) -> [Double]
-changes records getter = (\(r1, r2) -> getter r2 - getter r1) <$> pairs records
+changes rs getter = (\(r1, r2) -> getter r2 - getter r1) <$> pairs rs
 
 fitFileDir :: FilePath
 fitFileDir = "/home/matt/projects/LifeOfMatt/data/garmin/jsons/"
@@ -147,7 +145,7 @@ readActivity file =
       bytes <- B.readFile file
       case eitherDecode bytes of
         Left err -> error [fmt|\nFailed to parse {file}\n{err}\n|]
-        Right json -> pure json
+        Right j -> pure j
     else error [fmt|What the fuck is this {file} doing here?|]
 
 getActivitiesFromDir :: FilePath -> IO [Activity]

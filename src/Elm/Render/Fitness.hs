@@ -6,22 +6,18 @@ module Elm.Render.Fitness
   )
 where
 
-import Data.Bifunctor (bimap)
-import qualified Data.Foldable as F
-import qualified Data.Map.Lazy as M
 import qualified Data.Set as S
 import qualified Data.Text as T
-import Data.Time.Calendar (Day)
 import Data.Time.Calendar.WeekDate
-import Data.Time.Clock (UTCTime (..), getCurrentTime)
+import Data.Time.Clock (UTCTime (..))
 import Fitness.Garmin
 import Fitness.Utils
 import PyF (fmt)
 
 renderFitnessPage :: UTCTime -> [Activity] -> IO T.Text
-renderFitnessPage currentTime activities = do
+renderFitnessPage currentTime activities' = do
   let (year, week, _) = toWeekDate (getPstDay currentTime)
-  pure $ render $ getByYearAndWeek year week (mapWithDay activities)
+  pure $ render $ getByYearAndWeek year week (mapWithDay activities')
   where
     render :: [(Int, [Activity])] -> T.Text
     render activitiesByDay =
@@ -96,9 +92,9 @@ data =
           [fmt|{workoutTypeName} {day} {T.intercalate " " timeDoingSports}|]
           where
             timeDoingSports :: [T.Text]
-            timeDoingSports = timeDoingSport activities <$> S.toList sports
-            timeDoingSport :: [Activity] -> Sport -> T.Text
-            timeDoingSport activities sport' =
+            timeDoingSports = timeDoingSport <$> S.toList sports
+            timeDoingSport :: Sport -> T.Text
+            timeDoingSport sport' =
               let f = (\t a -> t + if sport' == sport a then totalActivityTime a else 0)
                in [fmt|{foldl f 0 activities / 3600 :.2}|]
         toAccessor :: T.Text -> T.Text

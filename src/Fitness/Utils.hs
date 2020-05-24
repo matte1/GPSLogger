@@ -18,7 +18,7 @@ where
 import qualified Data.Map.Lazy as M
 import qualified Data.Text as T
 import Data.Time.Calendar (Day)
-import Data.Time.Clock (NominalDiffTime (..), UTCTime (..), diffUTCTime)
+import Data.Time.Clock (NominalDiffTime, UTCTime (..), diffUTCTime)
 import Data.Time.LocalTime
 import PyF (fmt)
 
@@ -37,7 +37,7 @@ appendItemToListInMap key map' value =
 doubleFromNominalDiffTime :: NominalDiffTime -> Double
 doubleFromNominalDiffTime = read . T.unpack . T.replace "s" "" . T.pack . show
 
-average :: (Fractional a, Num a) => [a] -> a
+average :: (Fractional a) => [a] -> a
 average xs = sum xs / (fromIntegral $ length xs)
 
 dt :: (UTCTime, UTCTime) -> Double
@@ -50,7 +50,4 @@ toHoursMins seconds =
    in [fmt|{hours}:{mins':.2}|]
 
 getPstDay :: UTCTime -> Day
-getPstDay utc =
-  let pstTimeZone :: TimeZone
-      pstTimeZone = TimeZone (-8 * 60) False "PST"
-   in localDay $ utcToLocalTime pstTimeZone utc
+getPstDay = localDay . utcToLocalTime (TimeZone (-8 * 60) False "PST")

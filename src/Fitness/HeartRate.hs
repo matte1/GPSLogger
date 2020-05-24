@@ -8,17 +8,10 @@ module Fitness.HeartRate
   )
 where
 
-import Data.Aeson hiding (pairs)
-import qualified Data.ByteString.Lazy as B
 import qualified Data.Map.Lazy as M
-import Data.Maybe (catMaybes)
-import qualified Data.Text as T
-import Data.Time.Calendar.WeekDate
-import Data.Time.Clock (NominalDiffTime (..), UTCTime (..), diffUTCTime)
+import Data.Time.Clock (diffUTCTime)
 import Fitness.Garmin
 import Fitness.Utils
-import GHC.Generics (Generic)
-import System.Directory (listDirectory)
 
 data HeartRateZones a
   = HeartRateZones
@@ -93,7 +86,7 @@ getTimeInHrZones = foldl accumTimeInHrZone (pure 0) . pairs . records
       HeartRateZones Double ->
       (Record, Record) ->
       HeartRateZones Double
-    accumTimeInHrZone timeInZones (r1, r2) = accumByHeartRateZone meanHr dt timeInZones
+    accumTimeInHrZone timeInZones (r1, r2) = accumByHeartRateZone meanHr timeDifference timeInZones
       where
         meanHr = calcMeanHr (heartRate r1) (heartRate r2)
         calcMeanHr :: Maybe Double -> Maybe Double -> Double
@@ -101,5 +94,5 @@ getTimeInHrZones = foldl accumTimeInHrZone (pure 0) . pairs . records
         calcMeanHr (Just hr1) Nothing = hr1
         calcMeanHr Nothing (Just hr2) = hr2
         calcMeanHr Nothing Nothing = 0
-        dt :: Double
-        dt = doubleFromNominalDiffTime $ diffUTCTime (timestamp r2) (timestamp r1)
+        timeDifference :: Double
+        timeDifference = doubleFromNominalDiffTime $ diffUTCTime (timestamp r2) (timestamp r1)

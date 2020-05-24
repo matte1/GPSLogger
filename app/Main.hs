@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-unused-top-binds #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 import qualified Data.Map.Strict as M
@@ -5,12 +6,11 @@ import Elm.Render.Render (writeElmPages)
 import Fitness.Garmin
 import Fitness.Running
 
-activities :: IO [Activity]
-activities = getActivitiesFromDir fitFileDir
+getActivities :: IO [Activity]
+getActivities = getActivitiesFromDir fitFileDir
 
-weeklyRunningStats :: Int -> IO ()
-weeklyRunningStats week = do
-  activities <- getActivitiesFromDir fitFileDir
+weeklyRunningStats :: [Activity] -> Int -> IO ()
+weeklyRunningStats activities week = do
   let runningMap = mapWithDay $ filterBySport [Run, TrailRun] activities
       week20 =
         concatRunningMetrics
@@ -18,9 +18,8 @@ weeklyRunningStats week = do
           $ getByYearAndWeek 2020 week runningMap
   print week20
 
-yearlyRunningStats :: IO ()
-yearlyRunningStats = do
-  activities <- getActivitiesFromDir fitFileDir
+yearlyRunningStats :: [Activity] -> IO ()
+yearlyRunningStats activities = do
   let runningMap = mapWithYear $ filterBySport [Run, TrailRun] activities
       rmsByYear = M.map (map mkRunningMetrics) runningMap
       rmByYear = M.map concatRunningMetrics rmsByYear

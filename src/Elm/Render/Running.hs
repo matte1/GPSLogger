@@ -7,12 +7,10 @@ module Elm.Render.Running
 where
 
 import Data.Bifunctor (bimap)
-import qualified Data.Foldable as F
-import qualified Data.Map.Lazy as M
+import qualified Data.Map.Strict as M
 import qualified Data.Text as T
-import Data.Time.Calendar (Day)
 import Data.Time.Calendar.WeekDate
-import Data.Time.Clock (UTCTime (..), getCurrentTime)
+import Data.Time.Clock (UTCTime (..))
 import Fitness.Garmin
 import Fitness.Running
 import Fitness.Utils
@@ -73,7 +71,7 @@ view =
         rms = bimap id concatRunningMetrics <$> (getByYearAndWeek currentYear week runningMap)
         rm :: RunningMetrics
         rm = concatRunningMetrics $ snd <$> rms
-        write :: (Int, RunningMetrics) -> T.Text
-        write (day, rm) = [fmt|{typeName} {day} {miles:.2} {totalTime rm / 3600}|]
-          where
-            miles = meters rm / 1600
+        -- write :: (Int, RunningMetrics) -> T.Text
+        -- write (day, rm) = [fmt|{typeName} {day} {miles:.2} {totalTime rm / 3600}|]
+        --   where
+        --     miles = meters rm / 1600

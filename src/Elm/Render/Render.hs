@@ -6,13 +6,11 @@ module Elm.Render.Render
   )
 where
 
-import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
-import Data.Time.Clock (UTCTime (..), getCurrentTime)
+import Data.Time.Clock (getCurrentTime)
 import Elm.Render.Fitness (renderFitnessPage)
 import Elm.Render.Running (renderRunningPage)
 import Fitness.Garmin
-import PyF (fmt)
 
 writeElmPages :: IO ()
 writeElmPages = do

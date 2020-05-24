@@ -1,4 +1,4 @@
-module Financials.Example where
+module Financials.Example (example) where
 
 import Financials.Investments
 import Financials.Tax

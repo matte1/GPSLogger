@@ -83,8 +83,8 @@ limitRoth401K = 19000
 limitTrad401K :: ContributionLimit Traditional
 limitTrad401K = 19000
 
-limitRothIra :: ContributionLimit Traditional
-limitRothIra = 6000
+-- limitRothIra :: ContributionLimit Traditional
+-- limitRothIra = 6000
 
 invest :: InvestmentAccount PostTax Personal -> Income PostTax -> InvestmentAccount PostTax Personal
 invest a i = snd $ contribute (ContributionLimit 1e9) (Percentage 100) Nothing a i
@@ -97,12 +97,12 @@ contribute ::
   Income tax ->
   (Income tax, InvestmentAccount tax account)
 contribute (ContributionLimit limit) rate mmatching account (Income income) =
-  updateAccount (min maxContribution desiredContribution) mmatching
+  updateAccount (min maxContribution desiredContribution)
   where
     maxContribution = limit - contributionsYTD account
     desiredContribution = getPercentage rate income
-    updateAccount :: Double -> Maybe Percentage -> (Income tax, InvestmentAccount tax account)
-    updateAccount amount mmatching =
+    updateAccount :: Double -> (Income tax, InvestmentAccount tax account)
+    updateAccount amount =
       ( Income (income - amount),
         account
           { principal = principal account + amount + employerContribution mmatching,
