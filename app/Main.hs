@@ -13,8 +13,8 @@ weeklyRunningStats :: [Activity] -> Int -> IO ()
 weeklyRunningStats activities week = do
   let runningMap = mapWithDay $ filterBySport [Run, TrailRun] activities
       week20 =
-        concatRunningMetrics
-          $ map (concatRunningMetrics . (map mkRunningMetrics . snd))
+        mconcat
+          $ map (mconcat . (map mkRunningMetrics . snd))
           $ getByYearAndWeek 2020 week runningMap
   print week20
 
@@ -22,7 +22,7 @@ yearlyRunningStats :: [Activity] -> IO ()
 yearlyRunningStats activities = do
   let runningMap = mapWithYear $ filterBySport [Run, TrailRun] activities
       rmsByYear = M.map (map mkRunningMetrics) runningMap
-      rmByYear = M.map concatRunningMetrics rmsByYear
+      rmByYear = M.map mconcat rmsByYear
       rmByYear' = M.toList rmByYear
   mapM_ (\(year, rm) -> print "------------------" >> print year >> print rm) rmByYear'
 

@@ -63,7 +63,9 @@ data Sport
   | ShoulderStabili -- TODO Remove!
   | ClimbingWall -- TODO Remove!
   | HangboardMinimu -- TODO: Rename
-  deriving (Eq, Ord, Bounded, Generic, Show)
+  | PullUps
+  | FootCare
+  deriving (Eq, Ord, Bounded, Enum, Generic, Show)
 
 instance FromJSON Sport
 

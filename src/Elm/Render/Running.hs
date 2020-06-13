@@ -42,16 +42,18 @@ view =
   ]
 
 |]
-  where
-    typeName :: T.Text
-    typeName = "RunningMetrics"
-    (currentYear, currentWeek, _) = toWeekDate (getPstDay currentTime)
-    runningMap = M.map (map mkRunningMetrics) . mapWithDay $ filterBySport [Run, TrailRun] activities
     -- TODO
     -- , simpleLinePlot "{currentYear} {week}" ("Day", .day) ("Miles", .miles)
     --     [ {T.intercalate "\n  , " $ write <$> rms}
     --     ]
     -- , li [] [ text "Zones: {show $ toHoursMins <$> timeInHrZones rm}" ]
+  where
+    typeName :: T.Text
+    typeName = "RunningMetrics"
+    currentYear :: Integer
+    currentWeek :: Int
+    (currentYear, currentWeek, _) = toWeekDate (getPstDay currentTime)
+    runningMap = M.map (map mkRunningMetrics) . mapWithDay $ filterBySport [Run, TrailRun] activities
     writeDiv :: Int -> T.Text
     writeDiv week =
       [fmt|
@@ -67,11 +69,6 @@ view =
       ]
 |]
       where
-        rms :: [(Int, RunningMetrics)]
-        rms = bimap id concatRunningMetrics <$> (getByYearAndWeek currentYear week runningMap)
         rm :: RunningMetrics
-        rm = concatRunningMetrics $ snd <$> rms
-        -- write :: (Int, RunningMetrics) -> T.Text
-        -- write (day, rm) = [fmt|{typeName} {day} {miles:.2} {totalTime rm / 3600}|]
-        --   where
-        --     miles = meters rm / 1600
+        rm =
+          mconcat $ map snd (bimap id mconcat <$> (getByYearAndWeek currentYear week runningMap))

@@ -10,7 +10,6 @@
 module Fitness.Running
   ( RunningMetrics (..),
     mkRunningMetrics,
-    concatRunningMetrics,
   )
 where
 
@@ -53,11 +52,8 @@ instance Semigroup RunningMetrics where
         totalTime = totalTime rm1 + totalTime rm2,
         rmFilename = rmFilename rm1 <> " : " <> rmFilename rm2
       }
-
-concatRunningMetrics :: [RunningMetrics] -> RunningMetrics
-concatRunningMetrics = foldl (<>) emptyRunningMetric
-  where
-    emptyRunningMetric = RunningMetrics 0 0 (pure 0) 0 0 0 0 ""
+instance Monoid RunningMetrics where
+  mempty = RunningMetrics 0 0 (pure 0) 0 0 0 0 ""
 
 mkRunningMetrics :: Activity -> RunningMetrics
 mkRunningMetrics activity = running
