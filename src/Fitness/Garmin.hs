@@ -60,11 +60,12 @@ data Sport
   | Strength
   | RollOut
   | WristStabilizer
-  | ShoulderStabili -- TODO Remove!
+  | ShoulderStabili -- TODO Rename!
   | ClimbingWall -- TODO Remove!
   | HangboardMinimu -- TODO: Rename
   | PullUps
   | FootCare
+  | IndoorClimb
   deriving (Eq, Ord, Bounded, Enum, Generic, Show)
 
 instance FromJSON Sport

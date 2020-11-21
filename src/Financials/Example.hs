@@ -9,19 +9,19 @@ myAccounts =
   Accounts
     { tradinal401k =
         InvestmentAccount
-          { principal = 0,
+          { principal = 90000,
             earnings = 0,
-            contributionsYTD = 0
+            contributionsYTD = 28500
           },
       rothIRA =
         InvestmentAccount
-          { principal = 0,
+          { principal = 58000,
             earnings = 0,
             contributionsYTD = 0
           },
       personal =
         InvestmentAccount
-          { principal = 0,
+          { principal = 106000,
             earnings = 0,
             contributionsYTD = 0
           },
@@ -32,7 +32,7 @@ max401ContributionRate :: Percentage
 max401ContributionRate = Percentage 50
 
 averageMonthlyGrowth :: Percentage
-averageMonthlyGrowth = convertAnnualReturnToMonthly (Percentage 7)
+averageMonthlyGrowth = convertAnnualReturnToMonthly (Percentage 6)
 
 runMonth :: Accounts -> Income PreTax -> Accounts
 runMonth accounts income =
@@ -60,14 +60,14 @@ runMonth accounts income =
     (remainingIncomePostTax, newPersonal) =
       contribute
         (ContributionLimit 1e9)
-        (Percentage 50)
+        (Percentage 70)
         Nothing
         (personal compoundedAccounts)
         postTaxIncome
 
 example :: IO ()
 example = do
-  let myIncomes = replicate 12 (Income 11000)
+  let myIncomes = replicate 12 (Income 12000)
       year1 = foldl runMonth myAccounts myIncomes
       year2 = foldl runMonth (resetAllContributions year1) myIncomes
       year3 = foldl runMonth (resetAllContributions year2) myIncomes
@@ -88,9 +88,17 @@ example = do
       year18 = foldl runMonth (resetAllContributions year17) myIncomes
       year19 = foldl runMonth (resetAllContributions year18) myIncomes
       year20 = foldl runMonth (resetAllContributions year19) myIncomes
+  print "Year 1"
+  print year1
+  print "Year 5"
+  print year5
+  print "Year 7"
+  print year7
   print "Year 10"
   print year10
-  putStrLn "Year 15"
-  print year15
-  putStrLn "Year 20"
-  print year20
+  -- print "Year 14"
+  -- print year14
+  -- print "Year 16"
+  -- print year16
+  -- print "Year 20"
+  -- print year20

@@ -5,6 +5,7 @@ import qualified Data.Map.Strict as M
 import Elm.Render.Render (writeElmPages)
 import Fitness.Garmin
 import Fitness.Running
+import Financials.Example
 
 getActivities :: IO [Activity]
 getActivities = getActivitiesFromDir fitFileDir

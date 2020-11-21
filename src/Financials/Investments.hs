@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 -- | TODO
 module Financials.Investments
@@ -23,6 +24,8 @@ where
 
 import Financials.Utils
 
+import PyF (fmt)
+
 -- | Investment Account Types
 data Roth
 
@@ -42,7 +45,18 @@ data Accounts
         personal :: InvestmentAccount PostTax Personal,
         savings :: Income PostTax
       }
-  deriving (Show)
+instance Show Accounts where
+  show accounts =
+    [fmt|\
+Traditional 401K:
+{show $ tradinal401k accounts}
+Roth Ira:
+{show $ rothIRA accounts}
+Personal:
+{show $ personal accounts}
+Total: {accountTotal (tradinal401k accounts) + accountTotal (rothIRA accounts) + accountTotal (personal accounts)}
+
+|]
 
 resetAllContributions :: Accounts -> Accounts
 resetAllContributions a0 =
@@ -59,7 +73,16 @@ data InvestmentAccount tax account
         earnings :: Double,
         contributionsYTD :: Double
       }
-  deriving (Show)
+instance Show (InvestmentAccount tax account) where
+  show account =
+    [fmt|\
+    Principle: {principal account : .2}
+    Earnings: {earnings account : .2}
+    Total : {accountTotal account : .2}
+|]
+
+accountTotal :: InvestmentAccount tax account -> Double
+accountTotal account = principal account + earnings account
 
 resetContributions :: InvestmentAccount tax account -> InvestmentAccount tax account
 resetContributions a0 = a0 {contributionsYTD = 0}
