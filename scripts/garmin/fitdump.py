@@ -54,7 +54,6 @@ def get_sport(fitfile):
   sports = list(fitfile.get_messages(name='sport'))
   assert len(sports) == 1, f'The length of sports should always be 1!\n'
   sport = sports[0].fields[0].raw_value
-  # NOTE: Abs is included here because that was the original name of Workouts...
   if sport == 'Workouts':
     sport = get_workout(fitfile)
   return sport.replace(' ', '')

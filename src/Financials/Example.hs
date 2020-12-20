@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-unused-local-binds #-}
+
 module Financials.Example (example) where
 
 import Financials.Investments

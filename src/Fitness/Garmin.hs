@@ -66,6 +66,7 @@ data Sport
   | PullUps
   | FootCare
   | IndoorClimb
+  | Row
   deriving (Eq, Ord, Bounded, Enum, Generic, Show)
 
 instance FromJSON Sport
